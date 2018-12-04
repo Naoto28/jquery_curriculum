@@ -44,76 +44,72 @@
       // http://qiita.com/marumaru8228/items/65fc684383b096f0e548
 
 
-
       $(function(){
-        var word_2 = '';
-        var list = '';
-        var list_2 = '';
-        var num = 1;
+        var pre_keyword = '';
+        var pre_list = '';
+        var page_num = 1;
 
 
         $('#js-search-button').on('click', function(){
-          var word = $('#js-search-word').val();
-          if (word === word_2){
-            console.log(list_2);
-            $('.lists').prepend(list_2);
-            num++;
+          request();
+        });
+
+        function request() {
+          var keyword = $('#js-search-word').val();
+          if (keyword === pre_keyword){
+            page_num++;
           } else {
-            num = 1;
-            // $('.message').empty();
+            page_num = 1;
             $('.lists').empty();
+            pre_keyword = keyword;
           }
-          word_2 = word;
+          $('.message').empty();
+
 
           $.ajax({
             url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
             type: 'GET',
             datatype: 'json',
             data: {
-              // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れましょう。
-              applicationId: '1019399324990976605', // (今回はこのIDを使用してください)
-              booksGenreId: '001',
-              hits: '20',
-              page: num,
-              keyword: word
+            // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れましょう。
+            applicationId: '1019399324990976605', // (今回はこのIDを使用してください)
+            booksGenreId: '001',
+            hits: '20',
+            page: page_num,
+            keyword: keyword
             },
           }).done(function(data){
-              getItem(data);
-            })
-            .fail(function(data){
-              getNone(data);
-            });
+            getItem(data);
+          })
+          .fail(function(data){
+            getNone(data);
           });
+        }
 
         function getItem(data){
           if (data.count > 0){
-          $.each(data.Items, function(i, item){
-            var list = "<li class='lists__item'>"+
-                         "<div class='lists__item__inner'>"+
-                           "<a href='"+item.Item.itemUrl +"' class='lists__item__link'>"+
-                           "<img src='"+item.Item.largeImageUrl+"' class='lists__item__img' alt=''>"+
-                             "<p class='lists__item__detail'>作品名：　"+item.Item.title +"</p>"+
-                             "<p class='lists__item__detail'>作者　：　"+item.Item.author +"</p>"+
-                             "<p class='lists__item__detail'>出版社：　"+item.Item.publisherName +"</p>"+
-                           "</a>"+
-                         "</div>"+
-                        "</li>"
+            var list = '';
+            $.each(data.Items, function(i, item){
+              list += "<li class='lists__item'>"+
+                        "<div class='lists__item__inner'>"+
+                          "<a href='"+item.Item.itemUrl +"' class='lists__item__link'>"+
+                          "<img src='"+item.Item.largeImageUrl+"' class='lists__item__img' alt=''>"+
+                            "<p class='lists__item__detail'>作品名：　"+item.Item.title +"</p>"+
+                            "<p class='lists__item__detail'>作者　：　"+item.Item.author +"</p>"+
+                            "<p class='lists__item__detail'>出版社：　"+item.Item.publisherName +"</p>"+
+                          "</a>"+
+                        "</div>"+
+                      "</li>"
+            })
             $('.lists').prepend(list);
-            $('.message').empty();
-          })
-            list_2 = list;
           } else {
-            $('.lists').empty();
-            $('.message').empty();
             var message = "検索結果が見つかりませんでした。" + "<br>" + "別のキーワードで検索して下さい。"
             $('.message').append(message);
-            num = 1;
-            word_2 = '';
           }
         }
         function getNone(data){
-        $('.lists').empty();
-        console.log('読み込みエラー');
+          var message = "キーワードが見つかりませんでした。" + "<br>" + "キーワードを入力してから検索ボタンを押して下さい。"
+          $('.message').append(message);
         }
       });
 
