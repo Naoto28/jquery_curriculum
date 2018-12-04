@@ -21,17 +21,9 @@
           </div>
           <button id="js-search-button" class="search__btn">検索する</button>
         </div>
+        <div class="message">
+        </div>
         <ul class="lists">
-          <li class='lists__item'>
-           <div class='lists__item__inner'>
-             <a href='' class='lists__item__link' target='_blank'>
-               <img src='' class='lists__item__img' alt=''>
-               <p class='lists__item__detail'>作品名：</p>
-               <p class='lists__item__detail'>作者　：</p>
-               <p class='lists__item__detail'>出版社：</p>
-             </a>
-           </div>
-          </li>
         </ul>
       </div>
     </div>
@@ -50,17 +42,28 @@
 
       // オブジェクトで取得したデータへのアクセス方法 以下参考程度に
       // http://qiita.com/marumaru8228/items/65fc684383b096f0e548
-      //
-      //
+
 
 
       $(function(){
+        var word_2 = '';
+        var list = '';
+        var list_2 = '';
+        var num = 1;
+
 
         $('#js-search-button').on('click', function(){
-            var word = $('#js-search-word').val();
-
-            console.log(word);
-
+          var word = $('#js-search-word').val();
+          if (word === word_2){
+            console.log(list_2);
+            $('.lists').prepend(list_2);
+            num++;
+          } else {
+            num = 1;
+            // $('.message').empty();
+            $('.lists').empty();
+          }
+          word_2 = word;
 
           $.ajax({
             url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
@@ -71,96 +74,48 @@
               applicationId: '1019399324990976605', // (今回はこのIDを使用してください)
               booksGenreId: '001',
               hits: '20',
-              page: '1',
-              author: 'author',
-              title: 'title',
-              publisherName: 'publisherName',
-              keyword: encodeURIComponent(word)
+              page: num,
+              keyword: word
             },
-          }).done(function(data) {
-            // この中にデータ取得後の動きを記述していきます。
-            if (data.count > 0){
-              // console.log(word);
-            $.each(data.Items, function(i, item){
-              var temp = $(`<li><a href="${item.Item.itemUrl}"><img src="${item.Item.mediumImageUrls[0].imageUrl}"></a></li>`);
+          }).done(function(data){
+              getItem(data);
             })
+            .fail(function(data){
+              getNone(data);
+            });
+          });
+
+        function getItem(data){
+          if (data.count > 0){
+          $.each(data.Items, function(i, item){
+            var list = "<li class='lists__item'>"+
+                         "<div class='lists__item__inner'>"+
+                           "<a href='"+item.Item.itemUrl +"' class='lists__item__link'>"+
+                           "<img src='"+item.Item.largeImageUrl+"' class='lists__item__img' alt=''>"+
+                             "<p class='lists__item__detail'>作品名：　"+item.Item.title +"</p>"+
+                             "<p class='lists__item__detail'>作者　：　"+item.Item.author +"</p>"+
+                             "<p class='lists__item__detail'>出版社：　"+item.Item.publisherName +"</p>"+
+                           "</a>"+
+                         "</div>"+
+                        "</li>"
+            $('.lists').prepend(list);
+            $('.message').empty();
+          })
+            list_2 = list;
+          } else {
+            $('.lists').empty();
+            $('.message').empty();
+            var message = "検索結果が見つかりませんでした。" + "<br>" + "別のキーワードで検索して下さい。"
+            $('.message').append(message);
+            num = 1;
+            word_2 = '';
           }
-        });
+        }
+        function getNone(data){
+        $('.lists').empty();
+        console.log('読み込みエラー');
+        }
       });
-});
-
-
-
-
-
-
-
-
-
-      // $(function(){
-
-      //   $('#js-search-button').on('click', function(){
-      //       var word = $('#js-search-word').val();
-
-      //       console.log(word);
-
-
-
-      //     $.ajax({
-      //       url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
-      //       type: 'GET',
-      //       datatype: 'json',
-      //       data: {
-      //         // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れましょう。
-      //         applicationId: '1019399324990976605', // (今回はこのIDを使用してください)
-      //         booksGenreId: '001',
-      //         hits: '20',
-      //         page: '1',
-      //         author: 'author',
-      //         title: 'title',
-      //         publisherName, 'publisherName',
-      //         keyword: word
-      //       },
-      //     }).done(function(data) {
-      //       // この中にデータ取得後の動きを記述していきます。
-      //       getItem();
-      //     });
-      //   },
-
-      //   function getItem(data){
-      //     console.log(data);
-      //   }
-
-      //   );
-      // });
-
-
-
-// $(function(){
-//   // buttonがclickされたとき、変数に検索する値を代入
-//   $('#js-search-button').on('click', function(){
-//     var keyword = $('#search_area').val();
-
-//     // リクエストURLを設定する
-//     $.get('https://app.rakuten.co.jp/services/api/IchibaItem/Search/20170706?', {
-//       applicationId: "1046798079875156979",
-//       keyword: keyword
-
-//     // 結果が帰ってきたらここでそれを受け取り、空でなければ順番に出力していく
-//     }, function(data){
-//       if (data.count > 0){
-//         // console.log(data);
-//         $.each(data.Items, function(i, item){
-//           var temp = $(`<li><a href="${item.Item.itemUrl}"><img src="${item.Item.mediumImageUrls[0].imageUrl}"></a></li>`);
-//           $('ul').append(temp);
-//         }) // each
-//       } // if
-//     }); // function(data)
-//   }); // clickイベント
-// }); // function
-
-
-
 
 
     </script>

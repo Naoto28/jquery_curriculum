@@ -74,12 +74,12 @@ $(function() {
   $('#q1').css('color', 'Red');
 });
 // 第2問  id='q2'の要素をクリックしたら背景色をピンクにせよ。
-$('#q2').click(function() {
-    $(this).css('background-color', 'pink');
+$('#q2').on('click',function() {
+  $(this).css('background-color', 'pink');
 });
 // 第3問  id='q3'の要素をクリックしたら2秒かけてフェードアウトさせよ。
 $('#q3').click(function() {
-    $(this).fadeOut(2000);
+  $(this).fadeOut(2000);
 });
 // 第4問  id='q4'の要素をクリックしたらこの要素の前後とこの要素内の前後にテキストを挿入せよ。
 $('#q4').click(function() {
@@ -101,12 +101,10 @@ $('#q6').click(function() {
 });
 // 第7問  id='q7'の子要素をクリックしたら、その要素のインデックス（何番目か）をconsole.log()とalert()を用いて表示させよ。
 // $function(){
-$(function(){
-  $("#q7 li").on("click", function(){
-    var a = $("#q7 li").index(this);
-    alert(a+1);
-    console.log(a+1);
-  });
+$("#q7 li").on("click", function(){
+  var a = $("#q7 li").index(this);
+  alert(a);
+  console.log(a);
 });
 // 第8問  id='q8'の要素をhoverしたらlargeというクラスを付与し、hoverが外れたら、クラスを削除せよ。
 $('#q8').hover(function() {
@@ -121,11 +119,9 @@ $('#q9').click(function() {
     console.log(result);
 });
 // 第10問 id='q10'の子要素をクリックしたら、その要素のインデックスと等しいid='q11'の子要素にlargeというクラスを追加せよ。
-$(function(){
-  $("#q10 li").on("click", function(){
-    var a = $("#q10 li").index(this);
-    $("#q11 li").eq(a).addClass('large');
-  });
+$("#q10").find('li').on("click", function(){
+  var a = $("#q10 li").index(this);
+  $("#q11 li").eq(a).addClass('large');
 });
 </script>
 </body>
